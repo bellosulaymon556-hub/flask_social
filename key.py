@@ -58,9 +58,19 @@ def create_app(test_config=None):
         title = mapped_column(db.String(200), nullable=False)
         description = mapped_column(db.Text, nullable=False)
         image = mapped_column(db.String(500),nullable=False)
-        image1 =mapped_column(db.String(500),nullable=False)
+        # image1 =mapped_column(db.String(500),nullable=False)
         user_id =mapped_column(db.ForeignKey("user.id"),nullable=True)
         comments = db.relationship("Comment",back_populates="post",cascade="all, delete-orphan")
+        likes = db.relationship("PostLike",back_populates="post",cascade="all, delete-orphan")
+
+
+    class PostLike(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
+        post_id = db.Column(db.Integer,db.ForeignKey("post.id"),nullable=False)
+        __table_args__ = (db.UniqueConstraint("user_id","post_id",name="unique_user_post_like"),)
+        post = db.relationship("Post", back_populates="likes")
+
     @click.command('init-db')
     def init_db_command():
         """Command for initializing the database"""
@@ -128,6 +138,12 @@ def create_app(test_config=None):
 
         return render_template("login.html")
 
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        flash("You have been logged out successfully.")
+        return redirect(url_for('login'))
+
 
     @app.route('/uploads/<filename>')
     def uploaded_file(filename):
@@ -143,24 +159,24 @@ def create_app(test_config=None):
 
             if 'post_photo' not in request.files:
                 return 'no image uploaded'
-            if 'post_photo2' not in request.files:
-                return 'no image uploaded'
+            # if 'post_photo2' not in request.files:
+            #     return 'no image uploaded'
 
             may = request.files['post_photo']
-            photo = request.files['post_photo2']
+            # photo = request.files['post_photo2']
 
             if may.filename == '':
                 return 'no file selected'
-            if photo.filename == '':
-                return 'no file selected'
+            # if photo.filename == '':
+            #     return 'no file selected'
 
             if may and allowed_file(may.filename):
                 may_filename = secure_filename(may.filename)   
-            if photo and allowed_file(photo.filename):
-                photo_filename = secure_filename(photo.filename)   
+            # if photo and allowed_file(photo.filename):
+            #     photo_filename = secure_filename(photo.filename)   
 
                 may.save(os.path.join(app.config['UPLOAD_FOLDER'],may_filename))
-                photo.save(os.path.join(app.config['UPLOAD_FOLDER'],photo_filename))
+                # photo.save(os.path.join(app.config['UPLOAD_FOLDER'],photo_filename))
 
             else:
                 return'File extension not allowed'
@@ -169,7 +185,7 @@ def create_app(test_config=None):
                  title=request.form['title'],
                  description=request.form['description'],
                  image=may_filename,
-                 image1=photo_filename,
+                 # image1=photo_filename,
                  user_id=user.id
             )
 
@@ -179,8 +195,29 @@ def create_app(test_config=None):
         if session.get("user_id"):
             user = db.session.get(User, session["user_id"])
 
-        postslist=db.session.execute(db.select(Post).order_by(Post.date.desc())).scalars().all()
-        return render_template('primary.html',postslist=postslist,user=user)
+       
+        postslist = db.session.execute(
+            db.select(Post).order_by(Post.date.desc())
+        ).scalars().all()
+
+        liked_post_ids = set()
+
+        if user:
+            liked_post_ids = set(
+                db.session.execute(
+                    db.select(PostLike.post_id).where(
+                        PostLike.user_id == user.id
+                    )
+                ).scalars().all()
+            )
+
+        return render_template(
+            'primary.html',
+            postslist=postslist,
+            user=user,
+            liked_post_ids=liked_post_ids
+        )
+
 
     @app.route('/api/create', methods=['POST'])
     def create():
@@ -220,31 +257,31 @@ def create_app(test_config=None):
         if request.method == 'POST':
             if 'post_image' not in request.files:
                 return 'no image uploaded'
-            if 'post_image1' not in request.files:
-                return 'no image uploaded'
+            # if 'post_image1' not in request.files:
+            #     return 'no image uploaded'
 
             nysc = request.files['post_image']
-            nerd = request.files['post_image1']
+            # nerd = request.files['post_image1']
 
             if nysc.filename == '':
                 return 'no file selected'
 
-            if nerd.filename == '':
-                return 'no file selected'
+            # if nerd.filename == '':
+            #     return 'no file selected'
 
             if nysc and allowed_file(nysc.filename):
                 nysc_filename = secure_filename(nysc.filename)
 
-            if nerd and allowed_file(nerd.filename):
-                nerd_filename = secure_filename(nerd.filename)
+            # if nerd and allowed_file(nerd.filename):
+            #     nerd_filename = secure_filename(nerd.filename)
 
                 nysc.save(os.path.join(app.config['UPLOAD_FOLDER'], nysc_filename))
-                nerd.save(os.path.join(app.config['UPLOAD_FOLDER'], nerd_filename))
+                # nerd.save(os.path.join(app.config['UPLOAD_FOLDER'], nerd_filename))
 
             edit.title = request.form['title']
             edit.description = request.form['description']
             edit.image = nysc_filename
-            edit.image1 = nerd_filename
+            # edit.image1 = nerd_filename
 
             db.session.commit()
             return redirect(url_for('home'))
@@ -300,6 +337,41 @@ def create_app(test_config=None):
         db.session.commit()
 
         return redirect(url_for('home'))
+
+    @app.route('/post/<int:post_id>/like', methods=['POST'])
+    def toggle_like(post_id):
+        if not session.get("user_id"):
+            flash("Please log in to like a post.")
+            return redirect(url_for("login"))
+
+        user = db.session.get(User, session["user_id"])
+        post = db.session.get(Post, post_id)
+
+        if not user:
+            session.clear()
+            return redirect(url_for("login"))
+
+        if not post:
+            abort(404)
+
+        existing_like = db.session.execute(
+            db.select(PostLike).where(
+                PostLike.user_id == user.id,
+                PostLike.post_id == post.id
+            )
+        ).scalar_one_or_none()
+
+        if existing_like:
+            db.session.delete(existing_like)
+        else:
+            new_like = PostLike(
+                user_id=user.id,
+                post_id=post.id
+            )
+            db.session.add(new_like)
+
+        db.session.commit()
+        return redirect(url_for("home"))
 
     @app.route('/upload', methods=['GET','POST'])
     def upload_post():

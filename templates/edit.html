@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Post | EventLog</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            color: #1e1b2e;
+        }
+
+        .edit-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .edit-card {
+            background: #ffffff;
+            padding: 38px;
+            border: 1px solid #ece8f7;
+            border-radius: 18px;
+            box-shadow: 0 15px 45px rgba(76, 29, 149, 0.10);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            color: #6d28d9;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: #7c3aed;
+            color: #ffffff;
+            border-radius: 12px;
+            font-size: 24px;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+            letter-spacing: -0.7px;
+        }
+
+        .heading p {
+            color: #777187;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #302944;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"],
+        .form-group textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #ded9e9;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #1e1b2e;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            background: #faf9ff;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background: #ede9fe;
+            color: #6d28d9;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-right: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #898398;
+            line-height: 1.5;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .update-button,
+        .cancel-button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .update-button {
+            background: #7c3aed;
+            color: #ffffff;
+            border: none;
+        }
+
+        .update-button:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .cancel-button {
+            background: #ffffff;
+            color: #6d28d9;
+            border: 1px solid #ded9e9;
+        }
+
+        .cancel-button:hover {
+            background: #f5f3ff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            color: #928ba2;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .edit-card {
+                padding: 27px 20px;
+            }
+
+            .heading h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="edit-container">
+        <section class="edit-card">
+
+            <div class="brand">
+                <span class="brand-icon">E</span>
+                <span>EventLog</span>
+            </div>
+
+            <div class="heading">
+                <h1>Edit Your Post</h1>
+                <p>Update your event details and upload new images if needed.</p>
+            </div>
+
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  class="edit-form">
+
+                <div class="form-group">
+                    <label for="title">Post Title</label>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        value="{{ edit.title }}"
+                        placeholder="Enter your post title"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea
+                        name="description"
+                        id="description"
+                        placeholder="Write your event description..."
+                        required>{{ edit.description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">First Image</label>
+                    <input
+                        type="file"
+                        name="post_image"
+                        id="image"
+                        accept="image/*">
+                    <span class="form-hint">
+                        Choose a new image only if you want to replace the existing one.
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="image1">Second Image</label>
+                    <input
+                        type="file"
+                        name="post_image1"
+                        id="image1"
+                        accept="image/*">
+                    <span class="form-hint">
+                        Leave this empty if you don't want to change the image.
+                    </span>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="update-button">
+                        Save Changes
+                    </button>
+
+                    <a href="{{ url_for('home') }}"
+                       class="cancel-button">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </section>
+
+        <p class="footer">
+            &copy; 2026 EventLog. Share your moments.
+        </p>
+    </main>
+
+</body>
+</html>

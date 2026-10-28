@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | EventLog</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 15px;
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            color: #1e1b2e;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .signup-card {
+            background: #ffffff;
+            padding: 38px;
+            border-radius: 18px;
+            border: 1px solid #ece8f7;
+            box-shadow: 0 15px 45px rgba(76, 29, 149, 0.10);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 32px;
+            color: #6d28d9;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: #7c3aed;
+            color: white;
+            border-radius: 12px;
+            font-size: 24px;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .heading h1 {
+            font-size: 27px;
+            margin-bottom: 10px;
+            letter-spacing: -0.7px;
+        }
+
+        .heading p {
+            font-size: 14px;
+            color: #777187;
+            line-height: 1.6;
+        }
+
+        .flash-message {
+            background: #fff1f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+            padding: 12px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .signup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #302944;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ded9e9;
+            border-radius: 9px;
+            outline: none;
+            background: #ffffff;
+            color: #1e1b2e;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #aaa4b7;
+        }
+
+        .form-group input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+        }
+
+        .form-group small {
+            font-size: 12px;
+            color: #898398;
+        }
+
+        .signup-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px;
+            margin-top: 3px;
+            background: #7c3aed;
+            color: #ffffff;
+            border: none;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .signup-button:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .login-link {
+            margin-top: 25px;
+            text-align: center;
+            color: #777187;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #6d28d9;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #928ba2;
+            font-size: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .signup-card {
+                padding: 28px 22px;
+            }
+
+            .heading h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="signup-container">
+        <section class="signup-card">
+
+            <div class="brand">
+                <span class="brand-icon">E</span>
+                <span>EventLog</span>
+            </div>
+
+            <div class="heading">
+                <h1>Create your account</h1>
+                <p>Join EventLog and start sharing your events.</p>
+            </div>
+
+            {% for message in get_flashed_messages() %}
+                <div class="flash-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form method="POST" class="signup-form">
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="At least 8 characters"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required>
+                    <small>Password must contain at least 8 characters.</small>
+                </div>
+
+                <button type="submit" class="signup-button">
+                    Create Account <span>→</span>
+                </button>
+
+            </form>
+
+            <p class="login-link">
+                Already registered?
+                <a href="{{ url_for('login') }}">Log in</a>
+            </p>
+
+        </section>
+
+        <p class="footer">
+            &copy; 2026 EventLog. Share your moments.
+        </p>
+    </main>
+
+</body>
+</html>
